@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth0 Login</title>
+</head>
+<body>
+    <h1>Welcome</h1>
+    {% if session %}
+        <p>Hello, {{ session.name }} ({{ session.email }})</p>
+        <a href="/logout">Logout</a>
+        <pre>{{ pretty }}</pre>
+    {% else %}
+        <a href="/login">Login with Microsoft via Auth0</a>
+    {% endif %}
+</body>
+</html>
