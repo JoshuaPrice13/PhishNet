@@ -38,14 +38,14 @@ Gemini API (External) - AI phishing detection
 
 ### Useful Commands
 
-Stop everything
+Start containers
 ``` bash
-docker-compose down
+docker-compose up -d
 ```
 
-Start again (faster)
+Stop containers
 ``` bash
-docker-compose up
+docker-compose down
 ```
 
 View logs
