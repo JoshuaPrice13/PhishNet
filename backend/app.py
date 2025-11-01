@@ -13,9 +13,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-# Configuration
-LLAMA_API_KEY = os.getenv('LLAMA_API_KEY')
-
 @app.route('/')
 def index():
     if 'credentials' not in session:
