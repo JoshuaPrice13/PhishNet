@@ -1,24 +1,6 @@
 # PhishNet
 Okstate Hackathon 2025
 
-
-
-# PhishNet Docker Setup (Simplified - HTTP Only)
-
-## Architecture
-
-```
-Browser
-  ↓ HTTP
-Frontend (PHP/Apache) - http://localhost
-  ↓ API Calls
-Backend (Python/Flask) - http://localhost:5000
-
-Auth0 (External) - Authentication
-Microsoft Graph API (External) - Outlook email access
-Gemini API (External) - AI phishing detection
-```
-
 ## Project Structure
 
 ```
@@ -37,7 +19,24 @@ phishnet/
     └── requirements.txt
 ```
 
-## Useful Commands
+## PhishNet Docker Setup
+
+### Architecture
+
+```
+Browser
+  ↓ HTTP
+Frontend (PHP/Apache) - http://localhost
+  ↓ API Calls
+Backend (Python/Flask) - http://localhost:5000
+
+Auth0 (External) - Authentication
+Microsoft Graph API (External) - Outlook email access
+Gemini API (External) - AI phishing detection
+```
+
+
+### Useful Commands
 
 Stop everything
 ``` bash
