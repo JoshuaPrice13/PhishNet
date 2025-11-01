@@ -9,13 +9,13 @@ session_start();
     <title>PhishNet - AI Email Security</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body class="bg-primary min-h-screen">
     <div class="container mx-auto px-4 py-16">
         <div class="max-w-4xl mx-auto text-center">
             <!-- Header -->
             <div class="mb-12">
-                <h1 class="text-6xl font-bold text-blue-600 mb-4">
-                    🎣 PhishNet
+                <h1 class="text-6xl font-bold text-primary-600 mb-4">
+                    PhishNet
                 </h1>
                 <p class="text-2xl text-gray-700 mb-2">
                     AI-Powered Email Security Platform
@@ -30,7 +30,7 @@ session_start();
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <div class="text-4xl mb-3">🤖</div>
                     <h3 class="font-bold text-lg mb-2">AI Analysis</h3>
-                    <p class="text-gray-600 text-sm">Powered by Google Gemini to detect phishing attempts</p>
+                    <p class="text-gray-600 text-sm">Powered by Meta Llama to detect phishing attempts</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <div class="text-4xl mb-3">📧</div>
