@@ -12,7 +12,7 @@ CORS(app, supports_credentials=True)
 
 # Configuration
 AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+LLAMA_API_KEY = os.getenv('LLAMA_API_KEY')
 OUTLOOK_CLIENT_ID = os.getenv('OUTLOOK_CLIENT_ID')
 OUTLOOK_CLIENT_SECRET = os.getenv('OUTLOOK_CLIENT_SECRET')
 OUTLOOK_TENANT_ID = os.getenv('OUTLOOK_TENANT_ID', 'common')
@@ -23,7 +23,7 @@ def health():
         "status": "healthy",
         "message": "Backend is running! 🚀",
         "auth0_configured": bool(AUTH0_DOMAIN),
-        "gemini_configured": bool(GEMINI_API_KEY),
+        "llama_configured": bool(LLAMA_API_KEY),
         "outlook_configured": bool(OUTLOOK_CLIENT_ID)
     }), 200
 
