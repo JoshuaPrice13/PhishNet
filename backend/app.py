@@ -9,7 +9,7 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 load_dotenv()
 
-pp = Flask(__name__)
+app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
@@ -40,107 +40,6 @@ def user_info():
         "authenticated": True
     })
 
-@app.route('/emails', methods=['GET'])
-def get_emails():
-    """
-    Fetch emails from Microsoft Graph API (Outlook)
-    
-    In production, this would:
-    1. Get access token from request
-    2. Call Microsoft Graph API: GET https://graph.microsoft.com/v1.0/me/messages
-    3. Parse and return email data
-    """
-    # Mock data for now
-    return jsonify({
-        "emails": [
-            {
-                "id": "1",
-                "subject": "URGENT: Verify your account immediately!",
-                "sender": "security@micrsoft-support.com",  # Note typo
-                "snippet": "Your account will be suspended unless you verify within 24 hours...",
-                "received": "2024-11-01T10:30:00Z",
-                "risk_score": 95,
-                "is_phishing": True,
-                "reason": "Suspicious sender domain (misspelled 'microsoft'), urgency tactics, requests for account verification"
-            },
-            {
-                "id": "2",
-                "subject": "Weekly Team Meeting - Friday 2PM",
-                "sender": "manager@yourcompany.com",
-                "snippet": "Hi team, reminder about our weekly sync on Friday at 2PM...",
-                "received": "2024-11-01T09:15:00Z",
-                "risk_score": 5,
-                "is_phishing": False,
-                "reason": "Legitimate internal sender, standard meeting invitation format"
-            },
-            {
-                "id": "3",
-                "subject": "You've won a free iPhone 15!",
-                "sender": "prizes@totally-legit-giveaway.biz",
-                "snippet": "Congratulations! Click here to claim your prize now...",
-                "received": "2024-11-01T08:45:00Z",
-                "risk_score": 98,
-                "is_phishing": True,
-                "reason": "Too good to be true offer, suspicious domain (.biz), urgent call to action"
-            },
-            {
-                "id": "4",
-                "subject": "Your Amazon Order #123-4567890-1234567",
-                "sender": "auto-confirm@amazon.com",
-                "snippet": "Thank you for your order. Your package will arrive on Nov 5...",
-                "received": "2024-10-31T18:20:00Z",
-                "risk_score": 10,
-                "is_phishing": False,
-                "reason": "Legitimate Amazon domain, standard transaction format, realistic order number"
-            }
-        ],
-        "total": 4
-    })
-
-@app.route('/analyze-email', methods=['POST'])
-def analyze_email():
-    """
-    Analyze a single email with Gemini API
-    
-    In production, this would:
-    1. Extract email content from request
-    2. Call Gemini API with prompt
-    3. Parse AI response for risk assessment
-    """
-    data = request.json
-    email_content = data.get('content', '')
-    
-    # Mock analysis for now
-    return jsonify({
-        "risk_score": 75,
-        "is_phishing": True,
-        "reason": "Contains suspicious links and requests for personal information",
-        "indicators": [
-            "Suspicious sender domain",
-            "Urgency tactics",
-            "Requests for sensitive information",
-            "Spelling/grammar errors"
-        ]
-    })
-
-@app.route('/purge-emails', methods=['POST'])
-def purge_emails():
-    """
-    Delete flagged emails via Microsoft Graph API
-    
-    In production, this would:
-    1. Get email IDs from request
-    2. For each ID, call: DELETE https://graph.microsoft.com/v1.0/me/messages/{id}
-    3. Return success/failure status
-    """
-    data = request.json
-    email_ids = data.get('email_ids', [])
-    
-    return jsonify({
-        "success": True,
-        "deleted_count": len(email_ids),
-        "message": f"Successfully deleted {len(email_ids)} email(s)"
-    })
 
 @app.route('/login')
 def login():
