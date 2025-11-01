@@ -39,27 +39,27 @@ phishnet/
 
 ## Useful Commands
 
-- Stop everything
+Stop everything
 ``` bash
 docker-compose down
 ```
 
-- Start again (faster)
+Start again (faster)
 ``` bash
 docker-compose up
 ```
 
-- View logs
+View logs
 ``` bash
 docker-compose logs -f
 ```
 
-- Restart backend only
+Restart backend only
 ``` bash
 docker-compose restart backend
 ```
 
-- See running containers
+See running containers
 ``` bash
 docker-compose ps
 ```
