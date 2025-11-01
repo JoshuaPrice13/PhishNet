@@ -52,7 +52,7 @@ session_start();
                 </p>
                 <a href="/login.php" 
                    class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 inline-block font-semibold text-lg transition">
-                    Login with Auth0
+		    Login
                 </a>
             </div>
         </div>
