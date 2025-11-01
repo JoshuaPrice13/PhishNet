@@ -50,7 +50,7 @@ session_start();
                 <p class="text-gray-600 mb-6">
                     Connect your Outlook account and let AI protect you from phishing attacks
                 </p>
-                <a href="/login.php" 
+                <a href="/login" 
                    class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 inline-block font-semibold text-lg transition">
 		    Login
                 </a>
