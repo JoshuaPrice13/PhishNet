@@ -11,13 +11,13 @@
 
 ## 🚀 What is PhishNet?
 
-PhishNet is an intelligent email security platform that helps businesses stay safe from phishing attacks. It automatically scans your inbox, flags suspicious emails using AI, and allows you to delete threats with a single click - all while keeping your data secure and private.
+PhishNet is an intelligent email security platform that helps businesses stay safe from phishing attacks. It automatically scans your inbox, flags suspicious emails using AI, and allows you to delete threats with a single click -all while keeping your data secure and private.
 
 ## 💡 The Story Behind PhishNet
 
 ### Inspiration
 
-During our research for this hackathon, we discovered that **phishing attacks account for over 90% of successful data breaches** in businesses. We spoke to small business owners who had lost thousands of dollars and countless hours dealing with the aftermath of phishing scams. One story particularly stood out: a local startup nearly shut down after an employee fell for a sophisticated phishing email that appeared to be from their CEO.
+During our research for this hackathon, we discovered that **phishing attacks account for over 90% of successful data breaches** in businesses. We believe that stopping these attacks will have significant benefits to our community and nation.
 
 We realized that while large enterprises have dedicated security teams, small to medium-sized businesses often lack the resources to protect themselves effectively. We wanted to democratize email security and make enterprise-level protection accessible to everyone.
 
@@ -31,7 +31,7 @@ This hackathon was an incredible learning experience for our team:
 - **Full-Stack Integration**: Connecting a PHP frontend with a Python Flask backend while maintaining clean API boundaries
 - **Real-Time Processing**: Handling Gmail API rate limits and processing emails efficiently without impacting user experience
 
-We also discovered that **building trust** is as important as building features - users need to know their emails are processed securely without being stored.
+We also discovered that **building trust** is as important as building features - users need to know their emails are processed securely without being stored. 
 
 ### How We Built It
 
@@ -42,7 +42,7 @@ We also discovered that **building trust** is as important as building features 
 - **Email Integration**: Gmail API
 - **AI/ML**: Custom phishing detection model + OpenRouter AI API
 - **Infrastructure**: Docker, Docker Compose
-- **Deployment**: Vultr Cloud (Chicago)
+- **Deployment**: Vultr Cloud Deployment
 
 **Development Process:**
 
@@ -62,7 +62,7 @@ Setting up OAuth flows with Gmail API and Auth0 simultaneously was tricky. We ha
 Getting the frontend and backend containers to communicate properly while maintaining security took several iterations. We eventually settled on an internal Docker network with exposed ports only where necessary.
 
 **3. Real-Time Email Processing**
-Processing large inboxes quickly without overwhelming the server required careful optimization. We implemented batch processing and caching strategies to improve performance.
+Processing inboxes quickly without overwhelming the server required careful optimization. We implemented batch processing and caching strategies to improve performance.
 
 **4. AI Model Accuracy**
 Our initial model had too many false positives. We spent hours fine-tuning prompts and adjusting confidence thresholds to find the right balance between security and usability.
@@ -71,11 +71,11 @@ Our initial model had too many false positives. We spent hours fine-tuning promp
 Building a system that processes emails without storing them required rethinking traditional database patterns. All processing happens in memory, which added complexity to error handling and recovery.
 
 **The 3 AM Moment:**
-Around 3 AM, we discovered a critical bug where the delete functionality wasn't working due to incorrect Gmail API scopes. With the demo just hours away, we scrambled to fix the OAuth flow and re-authenticate all our test accounts. Coffee and determination got us through!
+Around 3 AM, we discovered a critical bug where the delete functionality wasn't working due to incorrect Gmail API scopes. With the demo just hours away, we scrambled to fix the OAuth flow and re-authenticate all our test accounts. Coffee and Red Bull got us through!
 
 ## ✨ Features
 
-- 🔍 **Automated Email Scanning** - Continuous monitoring of your inbox
+- 🔍 **Automated Email Scanning** - Monitoring of your inbox
 - 🤖 **AI-Powered Detection** - Advanced ML models identify phishing attempts
 - 🗑️ **One-Click Deletion** - Remove threats instantly
 - 🔒 **Privacy First** - No email storage, all processing happens server-side
@@ -126,89 +126,6 @@ phishnet/
     └── requirements.txt    # Python dependencies
 ```
 
-## 🖥️ Production Deployment
-
-**Server: PhishNet-Vultr**
-
-| Specification | Details |
-|--------------|---------|
-| **IP Address** | 207.148.9.3 |
-| **Location** | Chicago, IL |
-| **OS** | Debian 11 x64 (bullseye) |
-| **CPU** | 4 vCPUs |
-| **RAM** | 16 GB |
-| **Storage** | 80 GB NVMe |
-| **Uptime** | 99.9% SLA |
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Docker & Docker Compose
-- Gmail account
-- Auth0 account (free tier)
-- OpenRouter API key
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/phishnet.git
-cd phishnet
-```
-
-2. **Configure environment variables**
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-3. **Start the containers**
-```bash
-docker-compose up -d
-```
-
-4. **Access the application**
-- Frontend: http://localhost
-- Backend API: http://localhost:7877
-
-### Useful Commands
-
-**Container Management**
-```bash
-# Start containers
-docker-compose up -d
-
-# Stop containers
-docker-compose down
-
-# Restart backend only
-docker-compose restart backend
-
-# View running containers
-docker-compose ps
-```
-
-**Logs & Debugging**
-```bash
-# View all logs
-docker-compose logs -f
-
-# View backend logs only
-docker-compose logs -f backend
-
-# View frontend logs only
-docker-compose logs -f frontend
-```
-
-**Maintenance**
-```bash
-# Rebuild containers after code changes
-docker-compose up -d --build
-
-# Remove all containers and volumes
-docker-compose down -v
-```
-
 ## 🔒 Security & Privacy
 
 - **Zero Data Storage**: Emails are processed in memory and never stored
@@ -237,22 +154,19 @@ docker-compose down -v
 
 ## 👥 Team
 
-Built with ❤️ by [Your Team Name] at OKState Hackathon 2025
+Built by a group of four senior computer scientists at OKState Hackathon 2025
 
-- **[Name]** - Full Stack Development
-- **[Name]** - Backend & ML
-- **[Name]** - Frontend & Design
-- **[Name]** - DevOps & Deployment
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Alexander Seda
+- Trevor Mendenhall
+- Ahmad Coleman
+- Joshua Price
 
 ## 🙏 Acknowledgments
 
 - OKState Hackathon organizers for an amazing event
 - Auth0 for authentication infrastructure
 - OpenRouter for AI API access
+- Vultr for Cloud Deployment
 - The open-source community for incredible tools and libraries
 
 ---
