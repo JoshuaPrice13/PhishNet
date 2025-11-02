@@ -19,9 +19,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 @app.route('/')
 def index():
-    if 'credentials' not in session:
-        return redirect('http://127.0.0.1:80')  # Use your IP and port
-    return '<a href="/emails">Read Gmail Emails</a>'
+    return redirect("http://localhost/index.php")
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -51,7 +49,7 @@ def login():
                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": ["http://localhost:5000/callback"]
+                "redirect_uris": ["http://localhost:7877/callback"]
             }
         },
         scopes=SCOPES
@@ -74,7 +72,7 @@ def callback():
                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": ["http://localhost:5000/callback"]
+                "redirect_uris": ["http://localhost:7877/callback"]
             }
         },
         scopes=SCOPES,

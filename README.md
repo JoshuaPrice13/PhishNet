@@ -28,7 +28,7 @@ Browser
   ↓ HTTP
 Frontend (PHP/Apache) - http://localhost
   ↓ API Calls
-Backend (Python/Flask) - http://localhost:5000
+Backend (Python/Flask) - http://localhost:7877
 
 Auth0 (External) - Authentication
 Microsoft Graph API (External) - Outlook email access
