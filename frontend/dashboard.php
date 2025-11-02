@@ -31,16 +31,16 @@ if (!isset($_SESSION['user_id'])) {
     </script>
 
 </head>
-<body class="bg-gray-100">
+<body class="bg-background min-h-screen font-sans text-gray-800">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-primary shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-blue-600">🎣 PhishNet</h1>
+            <h1 class="text-2xl font-bold text-accent">PhishNet</h1>
             <div class="flex items-center gap-4">
-                <span class="text-gray-600">
+                <span class="text-background font-medium">
                     <?php echo htmlspecialchars($_SESSION['user_email']); ?>
                 </span>
-                <a href="/logout.php" class="text-red-600 hover:text-red-700">Logout</a>
+                <a href="/logout.php" class="text-accent hover:text-danger transition">Logout</a>
             </div>
         </div>
     </nav>
@@ -48,10 +48,10 @@ if (!isset($_SESSION['user_id'])) {
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
         <!-- Backend Status -->
-        <div class="bg-blue-100 border-l-4 border-blue-500 p-4 mb-6">
+        <div class="bg-secondary/10 border-l-4 border-secondary p-4 mb-6 rounded">
             <div class="flex items-center">
                 <div class="flex-1">
-                    <p class="text-blue-700">
+                    <p class="text-primary">
                         <strong>Backend Status:</strong> <span id="backend-status">Checking...</span>
                     </p>
                 </div>
@@ -60,43 +60,43 @@ if (!isset($_SESSION['user_id'])) {
 
         <!-- Stats -->
         <div class="grid md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-1">Total Emails</div>
-                <div class="text-3xl font-bold" id="total-emails">0</div>
+            <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
+                <div class="text-primary text-sm mb-1 font-semibold">Total Emails</div>
+                <div class="text-3xl font-bold text-primary" id="total-emails">0</div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-1">Flagged as Phishing</div>
-                <div class="text-3xl font-bold text-red-600" id="phishing-count">0</div>
+            <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
+                <div class="text-primary text-sm mb-1 font-semibold">Flagged as Phishing</div>
+                <div class="text-3xl font-bold text-danger" id="phishing-count">0</div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-1">Safe Emails</div>
-                <div class="text-3xl font-bold text-green-600" id="safe-count">0</div>
+            <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
+                <div class="text-primary text-sm mb-1 font-semibold">Safe Emails</div>
+                <div class="text-3xl font-bold text-secondary" id="safe-count">0</div>
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 class="text-xl font-bold mb-4">Actions</h2>
-            <div class="flex gap-4">
-                <button onclick="loadEmails()" 
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        <div class="bg-white rounded-lg shadow p-6 mb-8 border border-secondary/10">
+            <h2 class="text-xl font-bold text-primary mb-4">Actions</h2>
+            <div class="flex flex-wrap gap-4">
+                <button onclick="loadEmails()"
+                        class="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition shadow-sm">
                     🔄 Scan Outlook Inbox
                 </button>
-                <button onclick="purgePhishing()" 
-                        class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">
-                    🗑️ Purge Flagged Emails
+                <button onclick="purgePhishing()"
+                        class="bg-danger text-white px-6 py-3 rounded-lg hover:bg-danger/80 transition shadow-sm">
+                    🗑 Purge Flagged Emails
                 </button>
             </div>
         </div>
 
         <!-- Email List -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b">
-                <h2 class="text-xl font-bold">📧 Email Analysis</h2>
+        <div class="bg-white rounded-lg shadow border border-secondary/10">
+            <div class="p-6 border-b border-secondary/10 bg-background">
+                <h2 class="text-xl font-bold text-primary">📧 Email Analysis</h2>
             </div>
-            <div id="email-list" class="divide-y">
+            <div id="email-list" class="divide-y divide-secondary/10">
                 <div class="p-6 text-center text-gray-500">
-                    Click "Scan Outlook Inbox" to analyze your emails
+                    Click “Scan Outlook Inbox” to analyze your emails
                 </div>
             </div>
         </div>
