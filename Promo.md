@@ -11,13 +11,13 @@
 
 ## 🚀 What is PhishNet?
 
-PhishNet is an intelligent email security platform that helps businesses stay safe from phishing attacks. It automatically scans your inbox, flags suspicious emails using AI, and allows you to delete threats with a single click - all while keeping your data secure and private.
+PhishNet is an intelligent email security platform that helps businesses stay safe from phishing attacks. It automatically scans your inbox, flags suspicious emails using AI, and allows you to delete threats with a single click -all while keeping your data secure and private.
 
 ## 💡 The Story Behind PhishNet
 
 ### Inspiration
 
-During our research for this hackathon, we discovered that **phishing attacks account for over 90% of successful data breaches** in businesses. We believe that stopping these attacks will have siginifigant benifets to our comminity and nation.
+During our research for this hackathon, we discovered that **phishing attacks account for over 90% of successful data breaches** in businesses. We believe that stopping these attacks will have significant benefits to our community and nation.
 
 We realized that while large enterprises have dedicated security teams, small to medium-sized businesses often lack the resources to protect themselves effectively. We wanted to democratize email security and make enterprise-level protection accessible to everyone.
 
