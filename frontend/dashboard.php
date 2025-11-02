@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in (in real app, validate Auth0 session)
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
+    header('Location: /login.php');  // fix this once the login redirect works
     exit;
 }
 ?>
@@ -14,6 +14,22 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PhishNet</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#004D61',
+              secondary: '#00A6A6',
+              accent: '#FFD166',
+              danger: '#EF476F',
+              background: '#F8F9FA'
+            }
+          }
+        }
+      }
+    </script>
+
 </head>
 <body class="bg-gray-100">
     <!-- Navigation -->
