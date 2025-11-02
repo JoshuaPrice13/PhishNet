@@ -16,7 +16,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 @app.route('/')
 def index():
     if 'credentials' not in session:
-        return redirect(url_for('login'))
+        return redirect('http://127.0.0.1:80')  # Use your IP and port
     return '<a href="/emails">Read Gmail Emails</a>'
 
 @app.route('/health', methods=['GET'])
@@ -110,4 +110,4 @@ def emails():
     return output
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000,debug=True) 
+    app.run(host="0.0.0.0", port=7877,debug=True) 

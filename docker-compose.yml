@@ -23,7 +23,7 @@ services:
       dockerfile: Dockerfile
     container_name: phishnet_backend
     ports:
-      - "5000:5000"
+      - "7877:7877"
     environment:
       - FLASK_ENV=development
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
