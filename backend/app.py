@@ -1,6 +1,9 @@
 import requests
 import google.oauth2.credentials
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 import google_auth_oauthlib.flow
+from google_auth_oauthlib.flow import Flow
 import googleapiclient.discovery
 from dotenv import load_dotenv
 import os
@@ -37,6 +40,7 @@ SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/gmail.modify',
     'openid'
 ]
 
@@ -172,27 +176,38 @@ def logout():
 
 @app.route('/delete-emails', methods=['POST'])
 def delete_emails():
+    print("=== DELETE EMAILS ROUTE CALLED ===")
+    
     if 'credentials' not in session:
+        print("ERROR: No credentials in session")
         return jsonify({'error': 'Not authenticated'}), 401
     
     try:
+        print("Building Gmail service...")
         credentials = Credentials(**session['credentials'])
         service = build('gmail', 'v1', credentials=credentials)
         
         data = request.get_json()
+        print(f"Received data: {data}")
+        
         email_ids = data.get('email_ids', [])
+        print(f"Email IDs to delete: {email_ids}")
         
         if not email_ids:
+            print("ERROR: No email IDs provided")
             return jsonify({'error': 'No email IDs provided'}), 400
         
         deleted_count = 0
         for email_id in email_ids:
             try:
+                print(f"Attempting to trash email: {email_id}")
                 service.users().messages().trash(userId='me', id=email_id).execute()
                 deleted_count += 1
+                print(f"Successfully trashed email: {email_id}")
             except Exception as e:
                 print(f"Failed to delete email {email_id}: {str(e)}")
         
+        print(f"Total deleted: {deleted_count}")
         return jsonify({
             'success': True,
             'deleted_count': deleted_count,
@@ -200,6 +215,9 @@ def delete_emails():
         })
     
     except Exception as e:
+        print(f"ERROR in delete_emails: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/emails')

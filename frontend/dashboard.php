@@ -217,6 +217,8 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 	async function deletePhishingEmails() {
 	    const phishingEmails = emails.filter(e => e.is_phishing);
 	    
+	    console.log('Phishing emails:', phishingEmails);
+	    
 	    if (phishingEmails.length === 0) {
 	        alert('No phishing emails to delete');
 	        return;
@@ -226,10 +228,11 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 	        return;
 	    }
 	    
+	    // Extract email IDs
+	    const emailIds = phishingEmails.map(e => e.id);
+	    console.log('Email IDs to delete:', emailIds);
+	    
 	    try {
-	        // Extract email IDs
-	        const emailIds = phishingEmails.map(e => e.id);
-	        
 	        const response = await fetch(`${BACKEND_URL}/delete-emails`, {
 	            method: 'POST',
 	            credentials: 'include',
