@@ -156,10 +156,15 @@ def callback():
 @app.route('/logout')
 def logout():
     """Clear the session and log out"""
+    # revoke token if it exists
     access_token = session.get('access_token')
     if access_token:
         try:
-            requests.get('https://accounts.google.com/o/oauth2/revoke', params={'token': access_token})
+            requests.post(
+                'https://oauth2.googleapis.com/revoke',
+                params={'token': access_token},
+                headers={'content-type': 'application/x-www-form-urlencoded'}
+            )
         except Exception as e:
             print(f"Failed to revoke token: {e}")
     session.clear()
