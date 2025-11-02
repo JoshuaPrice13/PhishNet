@@ -1,5 +1,6 @@
 <?php
 session_start();
+$BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +69,7 @@ session_start();
       <p class="text-background/80 mb-6">
         Connect your Outlook account and let PhishNet’s AI guard your inbox.
       </p>
-      <a href="/login"
+      <a href="<?php echo $BACKEND_URL; ?>/login"
          class="bg-accent text-primary px-8 py-4 rounded-lg font-semibold text-lg shadow-md hover:bg-accent/80 transition">
         Login
       </a>

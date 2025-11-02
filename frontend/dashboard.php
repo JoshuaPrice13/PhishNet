@@ -108,7 +108,7 @@ if (!isset($_SESSION['user_id'])) {
         // Check backend health on load
         async function checkBackend() {
             try {
-                const response = await fetch('http://localhost:5000/health');
+                const response = await fetch('http://localhost:7877/health');
                 const data = await response.json();
                 document.getElementById('backend-status').innerHTML = 
                     `<span class="text-green-600 font-bold">✅ ${data.message}</span>`;
@@ -120,7 +120,7 @@ if (!isset($_SESSION['user_id'])) {
 
         async function loadEmails() {
             try {
-                const response = await fetch('http://localhost:5000/emails');
+                const response = await fetch('http://localhost:7877/emails');
                 const data = await response.json();
                 emails = data.emails;
                 displayEmails();
@@ -195,7 +195,7 @@ if (!isset($_SESSION['user_id'])) {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/purge-emails', {
+                const response = await fetch('http://localhost:7877/purge-emails', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
