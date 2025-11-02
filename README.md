@@ -2,7 +2,6 @@
 Okstate Hackathon 2025
 
 ## Project Structure
-
 ```
 phishnet/
 ├── docker-compose.yml
@@ -19,10 +18,23 @@ phishnet/
     └── requirements.txt
 ```
 
+## Server Information
+
+**Production Server: PhishNet-Vultr**
+
+- **IP Address:** 207.148.9.3
+- **Location:** Chicago
+- **OS:** Debian 11 x64 (bullseye)
+- **Resources:**
+  - 4 vCPUs
+  - 16 GB RAM
+  - 80 GB NVMe Storage
+- **Username:** root
+- **Created:** 7 hours ago
+
 ## PhishNet Docker Setup
 
 ### Architecture
-
 ```
 Browser
   ↓ HTTP
@@ -34,7 +46,6 @@ Auth0 (External) - Authentication
 Microsoft Graph API (External) - Outlook email access
 Gemini API (External) - AI phishing detection
 ```
-
 
 ### Useful Commands
 
@@ -62,7 +73,3 @@ See running containers
 ``` bash
 docker-compose ps
 ```
-
-
-
-
