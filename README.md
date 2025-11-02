@@ -15,6 +15,8 @@ phishnet/
 └── backend/
     ├── Dockerfile
     ├── app.py
+    ├── OpenRouter.py
+    ├── phishing_model.py
     └── requirements.txt
 ```
 
@@ -43,8 +45,8 @@ Frontend (PHP/Apache) - http://localhost
 Backend (Python/Flask) - http://localhost:7877
 
 Auth0 (External) - Authentication
-Microsoft Graph API (External) - Outlook email access
-Gemini API (External) - AI phishing detection
+Google API (External) - Gmail email access
+AI API (External) - AI trained on phishing
 ```
 
 ### Useful Commands
