@@ -267,51 +267,22 @@ def emails_detailed():
             # Store full body as content
             content = body
             
-            # Limit body for AI analysis (to save costs)
-            body_for_ai = body[:1000]
+            # Map confidence to a 0-100 scale for risk_score
+            risk_score = round(result["confidence"] * 100, 2)
             
-            # Send to Llama AI and wait for response
+            # is_phishing boolean
+            is_phishing = result["is_phishing"]
+            
             try:
-                prompt = f"""Analyze this email for phishing likelihood. Respond with ONLY a number between 0-100 (the percentage likelihood it's phishing).
+                result = analyze_email(content)
+                risk_score = round(result["confidence"] * 100, 2)
+                is_phishing = result["is_phishing"]
 
-Subject: {subject}
-From: {sender}
-Body: {body_for_ai}
-
-Respond with just the number (e.g., 85 or 15)."""
-
-                llama_response = requests.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {os.getenv('GROQ_API_KEY')}",
-                        "Content-Type": "application/json"
-                    },
-                    json={
-                        "model": "llama-3.3-70b-versatile",
-                        "messages": [
-                            {"role": "system", "content": "You are a cybersecurity expert. Respond only with a number 0-100."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        "temperature": 0.3,
-                        "max_tokens": 10
-                    }
-                )
-                
-                if llama_response.status_code == 200:
-                    result_text = llama_response.json()['choices'][0]['message']['content'].strip()
-                    # Extract number from AI response
-                    risk_score = int(''.join(filter(str.isdigit, result_text)))
-                    
-                    # Calculate boolean
-                    is_phishing = risk_score >= 50
-                else:
-                    risk_score = 0
-                    is_phishing = False
-                    
             except Exception as e:
+                # Return error and log server side
                 risk_score = 0
                 is_phishing = False
-                print(f"Error analyzing email: {e}")
+                return jsonify({"error": "Model inference failed", "detail": str(e)}), 500
             
             # Return this email's result with the exact fields requested
             return {
