@@ -1,4 +1,6 @@
 .env
 backend/__pycache__/
 *.pyc
+populate.sh
+
 

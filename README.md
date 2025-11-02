@@ -1,6 +1,8 @@
 # PhishNet
 Okstate Hackathon 2025
 
+PhishNet helps businesses stay safe from phishing by automatically scanning emails, flagging threats, and allowing one-click deletion. Built with a PHP/HTML/Tailwind frontend and Python Flask backend, all processing happens securely on our server without storing user data. Future updates will expand provider support and add AI explanations for flagged emails.
+
 ## Project Structure
 ```
 phishnet/
