@@ -60,16 +60,18 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
         </div>
 
         <!-- Stats -->
-        <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
-                <div class="text-primary text-sm mb-1 font-semibold">Total Emails Fetched</div>
+                <div class="text-primary text-sm mb-1 font-semibold">Total Emails Analyzed</div>
                 <div class="text-3xl font-bold text-primary" id="total-emails">0</div>
             </div>
             <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
-                <div class="text-primary text-sm mb-1 font-semibold">Gmail Connection</div>
-                <div class="text-xl font-bold" id="connection-status">
-                    <span class="text-gray-400">⏳ Checking...</span>
-                </div>
+                <div class="text-danger text-sm mb-1 font-semibold">🚨 Phishing Detected</div>
+                <div class="text-3xl font-bold text-danger" id="phishing-emails">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border border-secondary/10">
+                <div class="text-secondary text-sm mb-1 font-semibold">✅ Safe Emails</div>
+                <div class="text-3xl font-bold text-secondary" id="safe-emails">0</div>
             </div>
         </div>
 
@@ -87,7 +89,8 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
         <!-- Email List -->
         <div class="bg-white rounded-lg shadow border border-secondary/10">
             <div class="p-6 border-b border-secondary/10 bg-background">
-                <h2 class="text-xl font-bold text-primary">📧 Gmail Inbox</h2>
+                <h2 class="text-xl font-bold text-primary">📧 Email Analysis Results</h2>
+                <p class="text-gray-600 text-sm mt-1">AI-powered phishing detection using DistilBERT</p>
             </div>
             <div id="email-list" class="divide-y divide-secondary/10">
                 <div class="p-6 text-center text-gray-500">
@@ -190,8 +193,10 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     updateStats();
                     
                     // Update connection status on success
-                    document.getElementById('connection-status').innerHTML = 
-                        `<span class="text-green-600">✅ Connected</span>`;
+                    const phishingCount = emails.filter(e => e.is_phishing).length;
+                    if (phishingCount > 0) {
+                        alert(`⚠️ WARNING: ${phishingCount} phishing email(s) detected!`);
+                    }
                 } else {
                     throw new Error('Invalid response format');
                 }
@@ -221,30 +226,91 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 return;
             }
 
-            // Display emails as a list
-            emailList.innerHTML = emails.map((subject, index) => `
-                <div class="p-6 hover:bg-gray-50 transition">
+            // Display emails with color coding based on risk
+            emailList.innerHTML = emails.map((email, index) => {
+                // Determine background color and border based on risk
+                let bgColor = 'bg-white';
+                let borderColor = 'border-l-4 border-green-500';
+                let riskBadge = 'bg-green-100 text-green-700';
+                let riskIcon = '✅';
+                
+                if (email.is_phishing) {
+                    bgColor = 'bg-red-50';
+                    borderColor = 'border-l-4 border-red-600';
+                    riskBadge = 'bg-red-100 text-red-700';
+                    riskIcon = '🚨';
+                } else if (email.risk_score >= 30) {
+                    bgColor = 'bg-yellow-50';
+                    borderColor = 'border-l-4 border-yellow-500';
+                    riskBadge = 'bg-yellow-100 text-yellow-700';
+                    riskIcon = '⚠️';
+                }
+                
+                return `
+                <div class="p-6 hover:bg-gray-50 transition ${bgColor} ${borderColor}">
                     <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center text-secondary font-bold">
-                            ${index + 1}
+                        <div class="flex-shrink-0 text-3xl">
+                            ${riskIcon}
                         </div>
                         <div class="flex-1">
-                            <div class="font-semibold text-lg text-gray-800 mb-1">
-                                ${escapeHtml(subject) || '(No Subject)'}
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="font-bold text-lg text-gray-800 mb-1">
+                                        ${escapeHtml(email.subject) || '(No Subject)'}
+                                    </div>
+                                    <div class="text-gray-600 text-sm mb-2">
+                                        From: ${escapeHtml(email.sender)}
+                                    </div>
+                                    <div class="text-gray-700 text-sm mb-2">
+                                        ${escapeHtml(email.snippet)}
+                                    </div>
+                                    <div class="text-gray-400 text-xs">
+                                        ${email.received}
+                                    </div>
+                                </div>
+                                <div class="ml-4 text-right">
+                                    <span class="inline-block px-3 py-1 rounded-full text-sm font-bold ${riskBadge}">
+                                        Risk: ${email.risk_score}%
+                                    </span>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Confidence: ${(email.confidence * 100).toFixed(1)}%
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-gray-500 text-sm">
-                                📧 Email from your Gmail inbox
-                            </div>
+                            ${email.is_phishing ? `
+                                <div class="bg-red-100 border-l-4 border-red-500 p-3 mt-3">
+                                    <div class="font-bold text-red-700 mb-1">⚠️ PHISHING DETECTED</div>
+                                    <div class="text-red-600 text-sm">
+                                        This email has been flagged as a potential phishing attempt by our AI model.
+                                    </div>
+                                </div>
+                            ` : email.risk_score >= 30 ? `
+                                <div class="bg-yellow-100 border-l-4 border-yellow-500 p-3 mt-3">
+                                    <div class="font-bold text-yellow-700 mb-1">⚠️ Moderate Risk</div>
+                                    <div class="text-yellow-600 text-sm">
+                                        Exercise caution with this email.
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="text-green-600 text-sm mt-2 flex items-center gap-2">
+                                    <span>✅ This email appears safe</span>
+                                </div>
+                            `}
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         // Update stats
         function updateStats() {
             const total = emails.length;
+            const phishing = emails.filter(e => e.is_phishing).length;
+            const safe = total - phishing;
+            
             document.getElementById('total-emails').textContent = total;
+            document.getElementById('phishing-emails').textContent = phishing;
+            document.getElementById('safe-emails').textContent = safe;
         }
 
         // Escape HTML to prevent XSS

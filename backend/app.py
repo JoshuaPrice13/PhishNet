@@ -4,11 +4,17 @@ import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from dotenv import load_dotenv
 import os
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+from dotenv import load_dotenv
+import os
 from flask import Flask, jsonify, redirect, url_for, session, request
 from flask_cors import CORS
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import base64
 import json
+from phishing_model import analyze_email  # Import our AI model
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -155,7 +161,7 @@ def logout():
 
 @app.route('/emails')
 def emails():
-    """Fetch emails from the authenticated user's Gmail"""
+    """Fetch emails from the authenticated user's Gmail and analyze with AI"""
     if 'credentials' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
     
@@ -166,16 +172,53 @@ def emails():
         results = service.users().messages().list(userId='me', maxResults=10).execute()
         messages = results.get('messages', [])
         
-        email_subjects = []
+        analyzed_emails = []
+        
         for msg in messages:
             msg_detail = service.users().messages().get(userId='me', id=msg['id']).execute()
+            
+            # Extract email details
             subject = ''
+            sender = ''
+            received = ''
             for header in msg_detail['payload']['headers']:
                 if header['name'] == 'Subject':
                     subject = header['value']
-            email_subjects.append(subject)
+                elif header['name'] == 'From':
+                    sender = header['value']
+                elif header['name'] == 'Date':
+                    received = header['value']
+            
+            # Extract email body
+            body = ''
+            if 'parts' in msg_detail['payload']:
+                for part in msg_detail['payload']['parts']:
+                    if part['mimeType'] == 'text/plain' and 'data' in part['body']:
+                        body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
+                        break
+            elif 'body' in msg_detail['payload'] and 'data' in msg_detail['payload']['body']:
+                body = base64.urlsafe_b64decode(msg_detail['payload']['body']['data']).decode('utf-8', errors='ignore')
+            
+            # Analyze with AI model
+            email_content = f"Subject: {subject}\nFrom: {sender}\n\n{body[:1000]}"
+            ai_result = analyze_email(email_content)
+            
+            analyzed_emails.append({
+                'id': msg['id'],
+                'subject': subject,
+                'sender': sender,
+                'snippet': body[:200] if body else '(No content)',
+                'received': received,
+                'risk_score': ai_result['risk_score'],
+                'is_phishing': ai_result['is_phishing'],
+                'confidence': ai_result['confidence'],
+                'ai_result': ai_result['result']
+            })
         
-        return jsonify({'emails': email_subjects})
+        return jsonify({
+            'emails': analyzed_emails,
+            'total': len(analyzed_emails)
+        })
     except Exception as e:
         print(f"Error fetching emails: {e}")
         return jsonify({'error': 'Failed to fetch emails', 'details': str(e)}), 500
