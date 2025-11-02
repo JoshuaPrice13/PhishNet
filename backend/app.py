@@ -199,9 +199,15 @@ def emails():
             elif 'body' in msg_detail['payload'] and 'data' in msg_detail['payload']['body']:
                 body = base64.urlsafe_b64decode(msg_detail['payload']['body']['data']).decode('utf-8', errors='ignore')
             
-            # Analyze with AI model
-            email_content = f"Subject: {subject}\nFrom: {sender}\n\n{body[:1000]}"
-            ai_result = analyze_email(email_content)
+            # Analyze email with AI
+            try:
+                ai_result = analyze_email(body)
+                risk_score = round(ai_result["confidence"] * 100, 2)
+                is_phishing = ai_result["is_phishing"]
+            except Exception as e:
+                print(f"AI analysis failed for email {msg['id']}: {e}")
+                risk_score = 0
+                is_phishing = False
             
             analyzed_emails.append({
                 'id': msg['id'],
@@ -209,10 +215,8 @@ def emails():
                 'sender': sender,
                 'snippet': body[:200] if body else '(No content)',
                 'received': received,
-                'risk_score': ai_result['risk_score'],
-                'is_phishing': ai_result['is_phishing'],
-                'confidence': ai_result['confidence'],
-                'ai_result': ai_result['result']
+                'risk_score': risk_score,
+                'is_phishing': is_phishing
             })
         
         return jsonify({
@@ -222,6 +226,7 @@ def emails():
     except Exception as e:
         print(f"Error fetching emails: {e}")
         return jsonify({'error': 'Failed to fetch emails', 'details': str(e)}), 500
+
 
 
 @app.route('/emails-detailed')
