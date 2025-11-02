@@ -109,7 +109,9 @@ session_start();
         // Check backend health on load
         async function checkBackend() {
             try {
-                const response = await fetch('http://localhost:7877/health');
+		const response = await fetch('http://localhost:7877/health',
+	            {credentials: 'include'}
+		);
                 const data = await response.json();
                 document.getElementById('backend-status').innerHTML = 
                     `<span class="text-green-600 font-bold">✅ ${data.message}</span>`;
@@ -121,7 +123,9 @@ session_start();
 
         async function loadEmails() {
             try {
-                const response = await fetch('http://localhost:7877/emails');
+		const response = await fetch('http://localhost:7877/emails',
+		    {credentials: 'include'}
+		);
                 const data = await response.json();
                 emails = data.emails;
                 displayEmails();
@@ -197,7 +201,8 @@ session_start();
 
             try {
                 const response = await fetch('http://localhost:7877/purge-emails', {
-                    method: 'POST',
+		    method: 'POST',
+		    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email_ids: phishingEmails.map(e => e.id)

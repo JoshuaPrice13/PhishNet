@@ -5,6 +5,7 @@ import googleapiclient.discovery
 from dotenv import load_dotenv
 import os
 from flask import Flask, jsonify, redirect, url_for, session, request
+from flask_cors import CORS
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import base64
 import json
@@ -15,6 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+CORS(app, origins=["http://localhost"], supports_credentials=True)
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 @app.route('/')
@@ -92,7 +94,6 @@ def callback():
     }
     return redirect("http://localhost/dashboard.php")
     #return redirect(url_for('emails'))
-
 
 @app.route('/emails')
 def emails():
