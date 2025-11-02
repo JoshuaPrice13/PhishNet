@@ -2,10 +2,11 @@
 session_start();
 
 // Check if user is logged in (in real app, validate Auth0 session)
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');  // fix this once the login redirect works
-    exit;
-}
+//if (!isset($_SESSION['user_id'])) {
+    //header('Location: /login.php');  // fix this once the login redirect works
+    //exit;
+//}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

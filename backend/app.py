@@ -90,7 +90,8 @@ def callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
-    return redirect(url_for('emails'))
+    return redirect("http://localhost/dashboard.php")
+    #return redirect(url_for('emails'))
 
 
 @app.route('/emails')
