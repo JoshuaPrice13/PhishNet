@@ -1,6 +1,6 @@
 <?php
 session_start();
-$BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
+$BACKEND_URL = getenv('BACKEND_URL') ?: 'http://207.148.9.3:7877';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -67,15 +67,14 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
     <div class="bg-background/10 p-10 rounded-xl shadow-lg max-w-lg mx-auto border border-background/20">
       <h2 class="text-3xl font-bold text-accent mb-4">Get Started</h2>
       <p class="text-background/80 mb-6">
-        Connect your Gmail account and let PhishNet’s AI guard your inbox.
+        Connect your Gmail account and let PhishNet's AI guard your inbox.
       </p>
       <a href="<?php echo $BACKEND_URL; ?>/login"
-         class="bg-accent text-primary px-8 py-4 rounded-lg font-semibold text-lg shadow-md hover:bg-accent/80 transition">
-        Login
+         class="bg-accent text-primary px-8 py-4 rounded-lg font-semibold text-lg shadow-md hover:bg-accent/80 transition inline-block">
+        Login with Google
       </a>
     </div>
 
   </div>
 </body>
 </html>
-

@@ -30,11 +30,11 @@ app.secret_key = os.getenv("SECRET_KEY")
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True if using HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_DOMAIN'] = 'localhost'  # Share cookies across localhost
+app.config['SESSION_COOKIE_DOMAIN'] = '207.148.9.3'
 app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
 
 # Enable CORS with credentials support
-CORS(app, supports_credentials=True, origins=["http://localhost", "http://localhost:80"])
+CORS(app, supports_credentials=True, origins=["http://207.148.9.3", "http://207.148.9.3:80"])
 
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -46,7 +46,7 @@ SCOPES = [
 
 @app.route('/')
 def index():
-    return redirect("http://localhost/index.php")
+    return redirect("http://207.148.9.3/index.php")
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -98,12 +98,12 @@ def login():
                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": ["http://localhost:7877/callback"]
+                "redirect_uris": ["http://207.148.9.3:7877/callback"]
             }
         },
         scopes=SCOPES
     )
-    flow.redirect_uri = url_for('callback', _external=True)
+    flow.redirect_uri = "http://207.148.9.3:7877/callback"
     authorization_url, state = flow.authorization_url(
         access_type='offline',
         include_granted_scopes='true'
@@ -121,13 +121,13 @@ def callback():
                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": ["http://localhost:7877/callback"]
+                "redirect_uris": ["http://207.148.9.3:7877/callback"]
             }
         },
         scopes=SCOPES,
         state=state
     )
-    flow.redirect_uri = url_for('callback', _external=True)
+    flow.redirect_uri = "http://207.148.9.3:7877/callback"
     authorization_response = str(request.url)
     flow.fetch_token(authorization_response=authorization_response)
     credentials = flow.credentials
@@ -153,7 +153,7 @@ def callback():
     except Exception as e:
         print(f"Error getting user profile: {e}")
     
-    return redirect("http://localhost/dashboard.php")
+    return redirect("http://207.148.9.3/dashboard.php")
 
 @app.route('/logout')
 def logout():
@@ -170,7 +170,7 @@ def logout():
         except Exception as e:
             print(f"Failed to revoke token: {e}")
     session.clear()
-    return redirect("http://localhost/index.php")
+    return redirect("http://207.148.9.3/index.php")
 
 @app.route('/delete-emails', methods=['POST'])
 def delete_emails():
@@ -331,22 +331,17 @@ def emails_detailed():
             # Store full body as content
             content = body
             
-            # Map confidence to a 0-100 scale for risk_score
-            risk_score = round(result["confidence"] * 100, 2)
-            
-            # is_phishing boolean
-            is_phishing = result["is_phishing"]
+            # Initialize defaults
+            risk_score = 0
+            is_phishing = False
             
             try:
                 result = analyze_email(content)
                 risk_score = round(result["confidence"] * 100, 2)
                 is_phishing = result["is_phishing"]
-
             except Exception as e:
-                # Return error and log server side
-                risk_score = 0
-                is_phishing = False
-                return jsonify({"error": "Model inference failed", "detail": str(e)}), 500
+                print(f"Model inference failed for email {msg['id']}: {e}")
+                # Keep defaults: risk_score = 0, is_phishing = False
             
             # Return this email's result with the exact fields requested
             return {
