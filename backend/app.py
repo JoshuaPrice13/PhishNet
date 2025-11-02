@@ -156,6 +156,12 @@ def callback():
 @app.route('/logout')
 def logout():
     """Clear the session and log out"""
+    access_token = session.get('access_token')
+    if access_token:
+        try:
+            requests.get('https://accounts.google.com/o/oauth2/revoke', params={'token': access_token})
+        except Exception as e:
+            print(f"Failed to revoke token: {e}")
     session.clear()
     return redirect("http://localhost/index.php")
 
