@@ -55,6 +55,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 </div>
                 <div class="text-right">
                     <div id="backend-status" class="text-sm">Checking...</div>
+                    <div id="sync-status" class="text-xs text-white/70 mt-1">Initializing...</div>
                 </div>
             </div>
         </div>
@@ -79,22 +80,36 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
         <div class="bg-white rounded-lg shadow p-6 mb-8 border border-secondary/10">
             <h2 class="text-xl font-bold text-primary mb-4">Actions</h2>
             <div class="flex flex-wrap gap-4">
-                <button onclick="loadEmails()"
-                        class="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition shadow-sm">
-                    🔄 Refresh Inbox
-		</button>
-		<button onclick="deletePhishingEmails()"
-        	        class="bg-danger text-white px-6 py-3 rounded-lg hover:bg-danger/80 transition shadow-sm">
-    		    🗑️ Delete Phishing Emails
-		</button>
+                <button onclick="manualRefresh()"
+                        class="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition shadow-sm flex items-center gap-2">
+                    <span id="refresh-icon">🔄</span> <span id="refresh-text">Refresh Inbox</span>
+                </button>
+                <button onclick="deletePhishingEmails()"
+                        class="bg-danger text-white px-6 py-3 rounded-lg hover:bg-danger/80 transition shadow-sm">
+                    🗑️ Delete Phishing Emails
+                </button>
+                <button onclick="toggleAutoRefresh()"
+                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80 transition shadow-sm flex items-center gap-2">
+                    <span id="auto-refresh-icon">⏸️</span> <span id="auto-refresh-text">Pause Auto-Refresh</span>
+                </button>
             </div>
         </div>
 
         <!-- Email List -->
         <div class="bg-white rounded-lg shadow border border-secondary/10">
-            <div class="p-6 border-b border-secondary/10 bg-background">
-                <h2 class="text-xl font-bold text-primary">📧 Email Analysis Results</h2>
-                <p class="text-gray-600 text-sm mt-1">AI-powered phishing detection using DistilBERT</p>
+            <div class="p-6 border-b border-secondary/10 bg-background flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-primary">📧 Email Analysis Results</h2>
+                    <p class="text-gray-600 text-sm mt-1">AI-powered phishing detection using DistilBERT</p>
+                </div>
+                <div class="text-right">
+                    <div id="countdown-display" class="text-sm text-gray-500 font-mono">Next sync: --</div>
+                    <div id="new-emails-badge" class="hidden mt-1">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-accent text-primary">
+                            <span id="new-count">0</span> new
+                        </span>
+                    </div>
+                </div>
             </div>
             <div id="email-list" class="divide-y divide-secondary/10">
                 <div class="p-6 text-center text-gray-500">
@@ -106,13 +121,19 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 
     <script>
         const BACKEND_URL = '<?php echo $BACKEND_URL; ?>';
-        let emails = [];
+        let emailStack = [];
+        let displayedEmailIds = new Set();
+        let autoRefreshEnabled = true;
+        let refreshInterval = null;
+        let countdownInterval = null;
+        let nextRefreshTime = null;
+        const REFRESH_DELAY = 20000; // 20 seconds
 
         // Check backend health
         async function checkBackend() {
             try {
                 const response = await fetch(`${BACKEND_URL}/health`, {
-                    credentials: 'include'  // Send cookies with request
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 
@@ -133,19 +154,15 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
         async function checkUserInfo() {
             try {
                 const response = await fetch(`${BACKEND_URL}/user-info`, {
-                    credentials: 'include'  // Send cookies with request
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 
-                // Update navigation
                 document.getElementById('user-email').textContent = data.email;
                 document.getElementById('user-name').textContent = data.name;
-                
-                // Update welcome banner
                 document.getElementById('welcome-name').textContent = data.name;
                 document.getElementById('welcome-email').textContent = data.email;
                 
-                // Show profile pictures if available
                 if (data.picture) {
                     const navPic = document.getElementById('user-picture');
                     const welcomePic = document.getElementById('welcome-picture');
@@ -164,111 +181,239 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
             }
         }
 
-        // Load emails from Gmail
-        async function loadEmails() {
-            // Show loading state
-            document.getElementById('email-list').innerHTML = 
-                '<div class="p-6 text-center text-gray-500">⏳ Loading emails from Gmail...</div>';
+        // Update countdown display
+        function updateCountdown() {
+            if (!autoRefreshEnabled || !nextRefreshTime) {
+                document.getElementById('countdown-display').textContent = 'Auto-refresh paused';
+                return;
+            }
+
+            const now = Date.now();
+            const remaining = Math.max(0, Math.ceil((nextRefreshTime - now) / 1000));
+            
+            if (remaining === 0) {
+                document.getElementById('countdown-display').textContent = 'Syncing...';
+            } else {
+                document.getElementById('countdown-display').textContent = `Next sync: ${remaining}s`;
+            }
+        }
+
+        // Start countdown timer
+        function startCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            nextRefreshTime = Date.now() + REFRESH_DELAY;
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Load emails from Gmail (stack-based approach)
+        async function loadEmails(silent = false) {
+            if (!silent) {
+                updateSyncStatus('🔄 Syncing...', 'text-accent');
+                const refreshIcon = document.getElementById('refresh-icon');
+                refreshIcon.classList.add('animate-spin');
+            }
             
             try {
                 const response = await fetch(`${BACKEND_URL}/emails`, {
-                    credentials: 'include'  // Send cookies with request
+                    credentials: 'include'
                 });
                 
-                // Check if we need to login
                 if (!response.ok) {
                     throw new Error('Not authenticated or failed to fetch emails');
                 }
                 
                 const data = await response.json();
                 
-                // Handle the email array
                 if (data.emails && Array.isArray(data.emails)) {
-                    emails = data.emails;
+                    // Stack approach: check for new emails
+                    const newEmails = data.emails.filter(email => !displayedEmailIds.has(email.id));
+                    
+                    if (newEmails.length > 0) {
+                        // Add new emails to the top of the stack
+                        emailStack = [...newEmails, ...emailStack];
+                        newEmails.forEach(email => displayedEmailIds.add(email.id));
+                        
+                        // Show new emails badge
+                        showNewEmailsBadge(newEmails.length);
+                        
+                        // Check for new phishing
+                        const newPhishing = newEmails.filter(e => e.is_phishing).length;
+                        if (newPhishing > 0 && silent) {
+                            showNotification(`⚠️ ${newPhishing} new phishing email(s) detected!`);
+                        }
+                    } else if (!silent) {
+                        // Initial load
+                        emailStack = data.emails;
+                        data.emails.forEach(email => displayedEmailIds.add(email.id));
+                    }
+                    
                     displayEmails();
                     updateStats();
+                    updateSyncStatus('✅ Synced', 'text-green-400');
                     
-                    // Update connection status on success
-                    const phishingCount = emails.filter(e => e.is_phishing).length;
-                    if (phishingCount > 0) {
-                        //alert(`⚠️ WARNING: ${phishingCount} phishing email(s) detected!`);
-                    }
+                    // Reset refresh icon
+                    const refreshIcon = document.getElementById('refresh-icon');
+                    refreshIcon.classList.remove('animate-spin');
                 } else {
                     throw new Error('Invalid response format');
                 }
             } catch (error) {
                 console.error('Error loading emails:', error);
-                document.getElementById('email-list').innerHTML = `
-                    <div class="p-6 text-center">
-                        <div class="text-red-500 mb-4">❌ Failed to load emails</div>
-                        <p class="text-gray-600 mb-4">You may need to authenticate with Gmail first.</p>
-                        <a href="${BACKEND_URL}/login" 
-                           class="inline-block bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition">
-                            Login with Gmail
-                        </a>
-                    </div>
-                `;
-                document.getElementById('connection-status').innerHTML = 
-                    `<span class="text-red-600">❌ Not Connected</span>`;
+                updateSyncStatus('❌ Sync failed', 'text-danger');
+                const refreshIcon = document.getElementById('refresh-icon');
+                refreshIcon.classList.remove('animate-spin');
+                
+                if (!silent) {
+                    document.getElementById('email-list').innerHTML = `
+                        <div class="p-6 text-center">
+                            <div class="text-red-500 mb-4">❌ Failed to load emails</div>
+                            <p class="text-gray-600 mb-4">You may need to authenticate with Gmail first.</p>
+                            <a href="${BACKEND_URL}/login" 
+                               class="inline-block bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition">
+                                Login with Gmail
+                            </a>
+                        </div>
+                    `;
+                }
             }
         }
 
-	// Delete all phishing emails
-	async function deletePhishingEmails() {
-	    const phishingEmails = emails.filter(e => e.is_phishing);
-	    
-	    console.log('Phishing emails:', phishingEmails);
-	    
-	    if (phishingEmails.length === 0) {
-	        alert('No phishing emails to delete');
-	        return;
-	    }
-	    
-	    if (!confirm(`Are you sure you want to delete ${phishingEmails.length} phishing email(s)? This cannot be undone.`)) {
-	        return;
-	    }
-	    
-	    // Extract email IDs
-	    const emailIds = phishingEmails.map(e => e.id);
-	    console.log('Email IDs to delete:', emailIds);
-	    
-	    try {
-	        const response = await fetch(`${BACKEND_URL}/delete-emails`, {
-	            method: 'POST',
-	            credentials: 'include',
-	            headers: {
-	                'Content-Type': 'application/json'
-	            },
-	            body: JSON.stringify({ email_ids: emailIds })
-	        });
-	        
-	        if (!response.ok) {
-	            throw new Error('Failed to delete emails');
-	        }
-	        
-	        const data = await response.json();
-	        alert(`✅ Successfully deleted ${data.deleted_count} phishing email(s)`);
-	        
-	        // Reload emails to refresh the list
-	        await loadEmails();
-	    } catch (error) {
-	        console.error('Error deleting emails:', error);
-	        alert('❌ Failed to delete emails. Please try again.');
-	    }
-	}
+        // Manual refresh
+        async function manualRefresh() {
+            await loadEmails(false);
+            if (autoRefreshEnabled) {
+                startCountdown();
+            }
+        }
 
-        // Display emails in the UI
+        // Show notification for new emails
+        function showNotification(message) {
+            // You could implement browser notifications here
+            console.log(message);
+        }
+
+        // Show new emails badge
+        function showNewEmailsBadge(count) {
+            const badge = document.getElementById('new-emails-badge');
+            const countEl = document.getElementById('new-count');
+            countEl.textContent = count;
+            badge.classList.remove('hidden');
+            
+            // Hide badge after 5 seconds
+            setTimeout(() => {
+                badge.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Update sync status
+        function updateSyncStatus(message, colorClass) {
+            const statusEl = document.getElementById('sync-status');
+            statusEl.textContent = message;
+            statusEl.className = `text-xs mt-1 ${colorClass}`;
+        }
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const icon = document.getElementById('auto-refresh-icon');
+            const text = document.getElementById('auto-refresh-text');
+            
+            if (autoRefreshEnabled) {
+                icon.textContent = '⏸️';
+                text.textContent = 'Pause Auto-Refresh';
+                startAutoRefresh();
+                updateSyncStatus('Auto-refresh enabled', 'text-white/70');
+            } else {
+                icon.textContent = '▶️';
+                text.textContent = 'Resume Auto-Refresh';
+                stopAutoRefresh();
+                updateSyncStatus('Auto-refresh paused', 'text-white/70');
+            }
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            startCountdown();
+            refreshInterval = setInterval(() => {
+                loadEmails(true);
+                startCountdown();
+            }, REFRESH_DELAY);
+        }
+
+        // Stop auto-refresh
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            nextRefreshTime = null;
+            updateCountdown();
+        }
+
+        // Delete all phishing emails
+        async function deletePhishingEmails() {
+            const phishingEmails = emailStack.filter(e => e.is_phishing);
+            
+            if (phishingEmails.length === 0) {
+                alert('No phishing emails to delete');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete ${phishingEmails.length} phishing email(s)? This cannot be undone.`)) {
+                return;
+            }
+            
+            const emailIds = phishingEmails.map(e => e.id);
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/delete-emails`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email_ids: emailIds })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete emails');
+                }
+                
+                const data = await response.json();
+                alert(`✅ Successfully deleted ${data.deleted_count} phishing email(s)`);
+                
+                // Remove deleted emails from stack
+                emailStack = emailStack.filter(e => !emailIds.includes(e.id));
+                emailIds.forEach(id => displayedEmailIds.delete(id));
+                
+                displayEmails();
+                updateStats();
+            } catch (error) {
+                console.error('Error deleting emails:', error);
+                alert('❌ Failed to delete emails. Please try again.');
+            }
+        }
+
+        // Display emails in the UI (stack order - newest first)
         function displayEmails() {
             const emailList = document.getElementById('email-list');
             
-            if (emails.length === 0) {
+            if (emailStack.length === 0) {
                 emailList.innerHTML = '<div class="p-6 text-center text-gray-500">No emails found in your inbox</div>';
                 return;
             }
 
-            // Display emails with color coding based on risk
-            emailList.innerHTML = emails.map((email, index) => {
-                // Determine background color and border based on risk
+            emailList.innerHTML = emailStack.map((email, index) => {
                 let bgColor = 'bg-white';
                 let borderColor = 'border-l-4 border-green-500';
                 let riskBadge = 'bg-green-100 text-green-700';
@@ -279,14 +424,12 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     borderColor = 'border-l-4 border-red-600';
                     riskBadge = 'bg-red-100 text-red-700';
                     riskIcon = '🚨';
-                } 
-                else if (email.risk_score >= 30) {  // Remove the "< 70" condition
+                } else if (email.risk_score >= 30) {
                     bgColor = 'bg-yellow-50';
                     borderColor = 'border-l-4 border-yellow-500';
                     riskBadge = 'bg-yellow-100 text-yellow-700';
                     riskIcon = '⚠️';
-                }
-                else {  // risk_score < 30
+                } else {
                     bgColor = 'bg-green-50';
                     borderColor = 'border-l-4 border-green-500';
                     riskBadge = 'bg-green-100 text-green-700';
@@ -351,8 +494,8 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 
         // Update stats
         function updateStats() {
-            const total = emails.length;
-            const phishing = emails.filter(e => e.is_phishing).length;
+            const total = emailStack.length;
+            const phishing = emailStack.filter(e => e.is_phishing).length;
             const safe = total - phishing;
             
             document.getElementById('total-emails').textContent = total;
@@ -369,17 +512,13 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 
         // Initialize on page load
         window.addEventListener('load', async () => {
-            // Check backend health first
             await checkBackend();
-            
-            // Load and display user info
             const authenticated = await checkUserInfo();
             
-            // If authenticated, automatically load emails
             if (authenticated) {
                 await loadEmails();
+                startAutoRefresh();
             } else {
-                // Show login prompt
                 document.getElementById('email-list').innerHTML = `
                     <div class="p-6 text-center">
                         <div class="text-gray-500 mb-4">You need to authenticate with Gmail first.</div>
@@ -390,6 +529,11 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     </div>
                 `;
             }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
         });
     </script>
 </body>
