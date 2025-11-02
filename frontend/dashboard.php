@@ -151,14 +151,6 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     welcomePic.classList.remove('hidden');
                 }
                 
-                if (data.authenticated) {
-                    document.getElementById('connection-status').innerHTML = 
-                        `<span class="text-green-600">✅ Connected</span>`;
-                } else {
-                    document.getElementById('connection-status').innerHTML = 
-                        `<span class="text-red-600">❌ Not Connected</span>`;
-                }
-                
                 return data.authenticated;
             } catch (error) {
                 console.error('Error checking user info:', error);
