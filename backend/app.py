@@ -90,10 +90,31 @@ def callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
-    return redirect(url_for('index'))
+    return redirect(url_for('emails'))
+
 
 @app.route('/emails')
 def emails():
+    if 'credentials' not in session:
+        return redirect(url_for('login'))
+    creds = google.oauth2.credentials.Credentials(**session['credentials'])
+    service = googleapiclient.discovery.build('gmail', 'v1', credentials=creds)
+    results = service.users().messages().list(userId='me', maxResults=10).execute()
+    messages = results.get('messages', [])
+    output = '<h1>Last 10 Emails:</h1><ul>'
+    for msg in messages:
+        msg_detail = service.users().messages().get(userId='me', id=msg['id']).execute()
+        subject = ''
+        for header in msg_detail['payload']['headers']:
+            if header['name'] == 'Subject':
+                subject = header['value']
+        output += f'<li>{subject}</li>'
+    output += '</ul>'
+    return output
+
+
+#@app.route('/emails')
+def emails1():
     """Fetch emails and analyze them for phishing using Llama via Groq (with threading)"""
     if 'credentials' not in session:
         return redirect(url_for('login'))
