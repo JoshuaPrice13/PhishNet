@@ -150,8 +150,6 @@ def callback():
         session['user_name'] = user_profile.get('name')
         session['user_picture'] = user_profile.get('picture')
         
-        # Make session permanent (lasts 24 hours)
-        session.permanent = True
     except Exception as e:
         print(f"Error getting user profile: {e}")
     
