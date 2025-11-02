@@ -4,58 +4,77 @@ session_start();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhishNet - AI Email Security</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishNet - AI Email Security</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#004D61',
+            secondary: '#00A6A6',
+            accent: '#FFD166',
+            danger: '#EF476F',
+            background: '#F8F9FA'
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-primary min-h-screen">
-    <div class="container mx-auto px-4 py-16">
-        <div class="max-w-4xl mx-auto text-center">
-            <!-- Header -->
-            <div class="mb-12">
-                <h1 class="text-6xl font-bold text-primary-600 mb-4">
-                    PhishNet
-                </h1>
-                <p class="text-2xl text-gray-700 mb-2">
-                    AI-Powered Email Security Platform
-                </p>
-                <p class="text-lg text-gray-600">
-                    Protect your Outlook inbox with intelligent phishing detection
-                </p>
-            </div>
 
-            <!-- Features -->
-            <div class="grid md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="text-4xl mb-3">🤖</div>
-                    <h3 class="font-bold text-lg mb-2">AI Analysis</h3>
-                    <p class="text-gray-600 text-sm">Powered by Meta Llama to detect phishing attempts</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="text-4xl mb-3">📧</div>
-                    <h3 class="font-bold text-lg mb-2">Outlook Integration</h3>
-                    <p class="text-gray-600 text-sm">Seamlessly connects with Microsoft Outlook</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="text-4xl mb-3">⚡</div>
-                    <h3 class="font-bold text-lg mb-2">Real-time Protection</h3>
-                    <p class="text-gray-600 text-sm">Instant threat detection and alerts</p>
-                </div>
-            </div>
+<body class="bg-primary text-background min-h-screen flex flex-col justify-center">
+  <div class="container mx-auto px-6 py-12 text-center">
 
-            <!-- CTA Button -->
-            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md mx-auto">
-                <h2 class="text-2xl font-bold mb-4">Get Started</h2>
-                <p class="text-gray-600 mb-6">
-                    Connect your Outlook account and let AI protect you from phishing attacks
-                </p>
-                <a href="/login" 
-                   class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 inline-block font-semibold text-lg transition">
-		    Login
-                </a>
-            </div>
-        </div>
+    <!-- Logo / Header -->
+    <div class="mb-16">
+      <h1 class="text-6xl font-extrabold text-accent tracking-wide mb-4 drop-shadow-lg">
+        PhishNet
+      </h1>
+      <p class="text-2xl text-secondary font-semibold mb-2">
+        AI-Powered Email Security
+      </p>
+      <p class="text-lg text-background/80 max-w-2xl mx-auto">
+        Protect your inbox with deep learning–based phishing detection and real-time defense.
+      </p>
     </div>
+
+    <!-- Features -->
+    <div class="grid md:grid-cols-3 gap-8 mb-16">
+      <div class="bg-background/10 p-6 rounded-xl border border-background/20 backdrop-blur-sm hover:bg-background/20 transition">
+        <div class="text-4xl mb-3">🤖</div>
+        <h3 class="font-bold text-lg mb-2 text-accent">AI Analysis</h3>
+        <p class="text-background/80 text-sm">Uses large language models to detect subtle phishing attempts.</p>
+      </div>
+
+      <div class="bg-background/10 p-6 rounded-xl border border-background/20 backdrop-blur-sm hover:bg-background/20 transition">
+        <div class="text-4xl mb-3">📧</div>
+        <h3 class="font-bold text-lg mb-2 text-accent">Outlook Integration</h3>
+        <p class="text-background/80 text-sm">Seamlessly connects with Microsoft Outlook and other email providers.</p>
+      </div>
+
+      <div class="bg-background/10 p-6 rounded-xl border border-background/20 backdrop-blur-sm hover:bg-background/20 transition">
+        <div class="text-4xl mb-3">⚡</div>
+        <h3 class="font-bold text-lg mb-2 text-accent">Real-Time Defense</h3>
+        <p class="text-background/80 text-sm">Flags malicious links and attachments before they hit your inbox.</p>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="bg-background/10 p-10 rounded-xl shadow-lg max-w-lg mx-auto border border-background/20">
+      <h2 class="text-3xl font-bold text-accent mb-4">Get Started</h2>
+      <p class="text-background/80 mb-6">
+        Connect your Outlook account and let PhishNet’s AI guard your inbox.
+      </p>
+      <a href="/login"
+         class="bg-accent text-primary px-8 py-4 rounded-lg font-semibold text-lg shadow-md hover:bg-accent/80 transition">
+        Login
+      </a>
+    </div>
+
+  </div>
 </body>
 </html>
+
