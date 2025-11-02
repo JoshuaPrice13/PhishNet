@@ -187,7 +187,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     // Update connection status on success
                     const phishingCount = emails.filter(e => e.is_phishing).length;
                     if (phishingCount > 0) {
-                        alert(`⚠️ WARNING: ${phishingCount} phishing email(s) detected!`);
+                        //alert(`⚠️ WARNING: ${phishingCount} phishing email(s) detected!`);
                     }
                 } else {
                     throw new Error('Invalid response format');
