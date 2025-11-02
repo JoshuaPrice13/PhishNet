@@ -52,8 +52,8 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
 
       <div class="bg-background/10 p-6 rounded-xl border border-background/20 backdrop-blur-sm hover:bg-background/20 transition">
         <div class="text-4xl mb-3">📧</div>
-        <h3 class="font-bold text-lg mb-2 text-accent">Outlook Integration</h3>
-        <p class="text-background/80 text-sm">Seamlessly connects with Microsoft Outlook and other email providers.</p>
+        <h3 class="font-bold text-lg mb-2 text-accent">Gmail Integration</h3>
+        <p class="text-background/80 text-sm">Seamlessly connects with your Gmail account.</p>
       </div>
 
       <div class="bg-background/10 p-6 rounded-xl border border-background/20 backdrop-blur-sm hover:bg-background/20 transition">
@@ -67,7 +67,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
     <div class="bg-background/10 p-10 rounded-xl shadow-lg max-w-lg mx-auto border border-background/20">
       <h2 class="text-3xl font-bold text-accent mb-4">Get Started</h2>
       <p class="text-background/80 mb-6">
-        Connect your Outlook account and let PhishNet’s AI guard your inbox.
+        Connect your Gmail account and let PhishNet’s AI guard your inbox.
       </p>
       <a href="<?php echo $BACKEND_URL; ?>/login"
          class="bg-accent text-primary px-8 py-4 rounded-lg font-semibold text-lg shadow-md hover:bg-accent/80 transition">
