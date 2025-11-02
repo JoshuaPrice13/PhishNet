@@ -82,7 +82,11 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 <button onclick="loadEmails()"
                         class="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/80 transition shadow-sm">
                     🔄 Refresh Inbox
-                </button>
+		</button>
+		<button onclick="deletePhishingEmails()"
+        	        class="bg-danger text-white px-6 py-3 rounded-lg hover:bg-danger/80 transition shadow-sm">
+    		    🗑️ Delete Phishing Emails
+		</button>
             </div>
         </div>
 
@@ -208,6 +212,47 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                     `<span class="text-red-600">❌ Not Connected</span>`;
             }
         }
+
+	// Delete all phishing emails
+	async function deletePhishingEmails() {
+	    const phishingEmails = emails.filter(e => e.is_phishing);
+	    
+	    if (phishingEmails.length === 0) {
+	        alert('No phishing emails to delete');
+	        return;
+	    }
+	    
+	    if (!confirm(`Are you sure you want to delete ${phishingEmails.length} phishing email(s)? This cannot be undone.`)) {
+	        return;
+	    }
+	    
+	    try {
+	        // Extract email IDs
+	        const emailIds = phishingEmails.map(e => e.id);
+	        
+	        const response = await fetch(`${BACKEND_URL}/delete-emails`, {
+	            method: 'POST',
+	            credentials: 'include',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: JSON.stringify({ email_ids: emailIds })
+	        });
+	        
+	        if (!response.ok) {
+	            throw new Error('Failed to delete emails');
+	        }
+	        
+	        const data = await response.json();
+	        alert(`✅ Successfully deleted ${data.deleted_count} phishing email(s)`);
+	        
+	        // Reload emails to refresh the list
+	        await loadEmails();
+	    } catch (error) {
+	        console.error('Error deleting emails:', error);
+	        alert('❌ Failed to delete emails. Please try again.');
+	    }
+	}
 
         // Display emails in the UI
         function displayEmails() {

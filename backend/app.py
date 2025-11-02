@@ -170,6 +170,38 @@ def logout():
     session.clear()
     return redirect("http://localhost/index.php")
 
+@app.route('/delete-emails', methods=['POST'])
+def delete_emails():
+    if 'credentials' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    try:
+        credentials = Credentials(**session['credentials'])
+        service = build('gmail', 'v1', credentials=credentials)
+        
+        data = request.get_json()
+        email_ids = data.get('email_ids', [])
+        
+        if not email_ids:
+            return jsonify({'error': 'No email IDs provided'}), 400
+        
+        deleted_count = 0
+        for email_id in email_ids:
+            try:
+                service.users().messages().trash(userId='me', id=email_id).execute()
+                deleted_count += 1
+            except Exception as e:
+                print(f"Failed to delete email {email_id}: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'deleted_count': deleted_count,
+            'message': f'Deleted {deleted_count} email(s)'
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/emails')
 def emails():
     """Fetch emails from the authenticated user's Gmail and analyze with AI"""
