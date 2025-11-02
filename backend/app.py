@@ -159,9 +159,10 @@ def logout():
     session.clear()
     return redirect("http://localhost/index.php")
 
+
 @app.route('/emails')
 def emails():
-    """Fetch emails from the authenticated user's Gmail and analyze with AI"""
+    """Fetch emails from the authenticated user's Gmail, analyze with AI, and return JSON"""
     if 'credentials' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
     
@@ -171,23 +172,17 @@ def emails():
         
         results = service.users().messages().list(userId='me', maxResults=10).execute()
         messages = results.get('messages', [])
+        print("Messages returned:", messages)
         
         analyzed_emails = []
-        
+
         for msg in messages:
             msg_detail = service.users().messages().get(userId='me', id=msg['id']).execute()
             
             # Extract email details
-            subject = ''
-            sender = ''
-            received = ''
-            for header in msg_detail['payload']['headers']:
-                if header['name'] == 'Subject':
-                    subject = header['value']
-                elif header['name'] == 'From':
-                    sender = header['value']
-                elif header['name'] == 'Date':
-                    received = header['value']
+            subject = next((h['value'] for h in msg_detail['payload']['headers'] if h['name'] == 'Subject'), '(No Subject)')
+            sender = next((h['value'] for h in msg_detail['payload']['headers'] if h['name'] == 'From'), '(No Sender)')
+            received = next((h['value'] for h in msg_detail['payload']['headers'] if h['name'] == 'Date'), '')
             
             # Extract email body
             body = ''
@@ -196,18 +191,26 @@ def emails():
                     if part['mimeType'] == 'text/plain' and 'data' in part['body']:
                         body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
                         break
+                    elif part['mimeType'] == 'text/html' and 'data' in part['body'] and not body:
+                        body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
             elif 'body' in msg_detail['payload'] and 'data' in msg_detail['payload']['body']:
                 body = base64.urlsafe_b64decode(msg_detail['payload']['body']['data']).decode('utf-8', errors='ignore')
+            
+            body = body or ''
             
             # Analyze email with AI
             try:
                 ai_result = analyze_email(body)
-                risk_score = round(ai_result["confidence"] * 100, 2)
-                is_phishing = ai_result["is_phishing"]
+                risk_score = round(ai_result.get("confidence", 0) * 100, 2)
+                is_phishing = ai_result.get("is_phishing", False)
+                confidence = ai_result.get("confidence", 0)
+                result_text = ai_result.get("result", "")
             except Exception as e:
                 print(f"AI analysis failed for email {msg['id']}: {e}")
                 risk_score = 0
                 is_phishing = False
+                confidence = 0
+                result_text = ""
             
             analyzed_emails.append({
                 'id': msg['id'],
@@ -216,111 +219,20 @@ def emails():
                 'snippet': body[:200] if body else '(No content)',
                 'received': received,
                 'risk_score': risk_score,
-                'is_phishing': is_phishing
+                'is_phishing': is_phishing,
+                'confidence': confidence,
+                'ai_result': result_text
             })
         
+        # Return JSON instead of HTML
         return jsonify({
             'emails': analyzed_emails,
             'total': len(analyzed_emails)
         })
+    
     except Exception as e:
         print(f"Error fetching emails: {e}")
         return jsonify({'error': 'Failed to fetch emails', 'details': str(e)}), 500
-
-
-
-@app.route('/emails-detailed')
-def emails_detailed():
-    """Fetch emails and analyze them for phishing using Llama via Groq (with threading)"""
-    if 'credentials' not in session:
-        return jsonify({'error': 'Not authenticated'}), 401
-    
-    try:
-        creds = google.oauth2.credentials.Credentials(**session['credentials'])
-        service = googleapiclient.discovery.build('gmail', 'v1', credentials=creds)
-        results = service.users().messages().list(userId='me', maxResults=10).execute()
-        messages = results.get('messages', [])
-        
-        analyzed_emails = []
-        
-        # Function to analyze a single email (will run in parallel)
-        def analyze_single_email(msg):
-            msg_detail = service.users().messages().get(userId='me', id=msg['id']).execute()
-            
-            # Extract email details
-            subject = ''
-            sender = ''
-            received = ''
-            for header in msg_detail['payload']['headers']:
-                if header['name'] == 'Subject':
-                    subject = header['value']
-                elif header['name'] == 'From':
-                    sender = header['value']
-                elif header['name'] == 'Date':
-                    received = header['value']
-            
-            # Extract email body
-            body = ''
-            if 'parts' in msg_detail['payload']:
-                for part in msg_detail['payload']['parts']:
-                    if part['mimeType'] == 'text/plain' and 'data' in part['body']:
-                        body = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8')
-                        break
-            elif 'body' in msg_detail['payload'] and 'data' in msg_detail['payload']['body']:
-                body = base64.urlsafe_b64decode(msg_detail['payload']['body']['data']).decode('utf-8')
-            
-            # Store full body as content
-            content = body
-            
-            # Map confidence to a 0-100 scale for risk_score
-            risk_score = round(result["confidence"] * 100, 2)
-            
-            # is_phishing boolean
-            is_phishing = result["is_phishing"]
-            
-            try:
-                result = analyze_email(content)
-                risk_score = round(result["confidence"] * 100, 2)
-                is_phishing = result["is_phishing"]
-
-            except Exception as e:
-                # Return error and log server side
-                risk_score = 0
-                is_phishing = False
-                return jsonify({"error": "Model inference failed", "detail": str(e)}), 500
-            
-            # Return this email's result with the exact fields requested
-            return {
-                'id': msg['id'],
-                'subject': subject,
-                'sender': sender,
-                'content': content,
-                'received': received,
-                'risk_score': risk_score,
-                'is_phishing': is_phishing
-            }
-        
-        # Process emails in parallel using ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            # Submit all emails for processing at once
-            future_to_msg = {executor.submit(analyze_single_email, msg): msg for msg in messages}
-            
-            # Collect results as they complete
-            for future in as_completed(future_to_msg):
-                try:
-                    result = future.result()
-                    analyzed_emails.append(result)
-                except Exception as e:
-                    print(f"Error processing email: {e}")
-        
-        # After ALL emails are analyzed and stored, return everything at once
-        return jsonify({
-            'emails': analyzed_emails,
-            'total': len(analyzed_emails)
-        })
-    except Exception as e:
-        print(f"Error in detailed email analysis: {e}")
-        return jsonify({'error': 'Failed to analyze emails', 'details': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7877, debug=True)
