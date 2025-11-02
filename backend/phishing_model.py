@@ -1,8 +1,11 @@
+
 # phishing_model.py
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+import json
+from pathlib import Path
 
-# Model name on Hugging Face
+# Model name on Huging Face
 MODEL_NAME = "cybersectony/phishing-email-detection-distilbert_v2.4.1"
 
 # Load once on import
@@ -11,33 +14,26 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 model.eval()  # set to eval mode
 
-labels = ["legitimate", "phishing"]
-print("Model loaded and ready!")
+labels = ["legitimate_email", "phishing_email", "legitimate_url", "phishing_url_alt"]
 
-def analyze_email(content: str):
-    """
-    Returns a dict: { result, confidence, is_phishing, risk_score }
-    """
-    if not isinstance(content, str):
-        content = str(content or "")
-    
-    # Tokenize and get prediction
-    inputs = tokenizer(content, return_tensors="pt", truncation=True, max_length=512)
-    
+def analyze_email(email_text):
+    inputs = tokenizer(email_text, return_tensors="pt", truncation=True, max_length=512)
     with torch.no_grad():
-        logits = model(**inputs).logits
-        prediction = int(torch.argmax(logits, dim=1).item())
-        confidence = float(torch.softmax(logits, dim=1)[0][prediction].item())
+        outputs = model(**inputs)
+        probs = torch.nn.functional.softmax(outputs.logits, dim=-1)[0].tolist()
     
-    # Calculate risk score (0-100)
-    if labels[prediction] == "phishing":
-        risk_score = int(confidence * 100)
-    else:
-        risk_score = int((1 - confidence) * 100)
+    # Model labels: ["legitimate_email", "phishing_email", "legitimate_url", "phishing_url"]
+    phishing_prob = probs[1] + probs[3]  # sum phishing email + phishing URL
+    is_phishing = phishing_prob > 0.5      # threshold you can tune
+    risk_score = int(phishing_prob * 100)
+    
+    # Pick the highest probability for result display
+    max_idx = probs.index(max(probs))
+    result_label = ["legitimate_email", "phishing_email", "legitimate_url", "phishing_url"][max_idx]
     
     return {
-        "result": labels[prediction],
-        "confidence": round(confidence, 4),
-        "is_phishing": labels[prediction] == "phishing",
+        "result": result_label,
+        "confidence": round(max(probs), 4),
+        "is_phishing": is_phishing,
         "risk_score": risk_score
     }

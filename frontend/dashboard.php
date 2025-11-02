@@ -226,16 +226,23 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 let riskBadge = 'bg-green-100 text-green-700';
                 let riskIcon = '✅';
                 
-                if (email.is_phishing) {
+                if (email.risk_score >= 75) {
                     bgColor = 'bg-red-50';
                     borderColor = 'border-l-4 border-red-600';
                     riskBadge = 'bg-red-100 text-red-700';
                     riskIcon = '🚨';
-                } else if (email.risk_score >= 30) {
+                } 
+                else if (email.risk_score >= 30) {  // Remove the "< 70" condition
                     bgColor = 'bg-yellow-50';
                     borderColor = 'border-l-4 border-yellow-500';
                     riskBadge = 'bg-yellow-100 text-yellow-700';
                     riskIcon = '⚠️';
+                }
+                else {  // risk_score < 30
+                    bgColor = 'bg-green-50';
+                    borderColor = 'border-l-4 border-green-500';
+                    riskBadge = 'bg-green-100 text-green-700';
+                    riskIcon = '✅';
                 }
                 
                 return `
@@ -265,7 +272,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                                         Risk: ${email.risk_score}%
                                     </span>
                                     <div class="text-xs text-gray-500 mt-1">
-                                        Confidence: ${(email.confidence * 100).toFixed(1)}%
+                                        Confidence: ${(email.confidence * 100)}%
                                     </div>
                                 </div>
                             </div>

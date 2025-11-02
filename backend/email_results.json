@@ -1,0 +1,112 @@
+[
+  {
+    "id": "19a44fcc78b02e5b",
+    "subject": "Nigerian Prince",
+    "sender": "Joshua Price <cowboyprice13@gmail.com>",
+    "snippet": "You are eligible for 10000000 dollars!\r\nJust enter your social security number here:\r\n\r\nhttp://phishingAttackWebsite.com\r\n\r\n",
+    "received": "Sun, 2 Nov 2025 14:33:26 +0000",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a44fb94a0c8fc9",
+    "subject": "Security alert",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "snippet": "[image: Google]\r\nYou allowed Microsoft apps & services access to some of your Google Account\r\ndata\r\n\r\n\r\njprice2335@gmail.com\r\n\r\nIf you didn\u2019t allow Microsoft apps & services access to some of your Goo",
+    "received": "Sun, 02 Nov 2025 14:32:09 GMT",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a448e2ac65545f",
+    "subject": "Security alert",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "snippet": "[image: Google]\r\nYou allowed HackOkstate2025 access to some of your Google Account data\r\n\r\n\r\njprice2335@gmail.com\r\n\r\nIf you didn\u2019t allow HackOkstate2025 access to some of your Google Account\r\ndata, so",
+    "received": "Sun, 02 Nov 2025 12:32:38 GMT",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a44710b3cab2f4",
+    "subject": "Building a Complex, Production-Ready RAG System with LangChain, LangGraph, and RAGAS | Fareed Khan in Level Up Coding",
+    "sender": "Medium Daily Digest <noreply@medium.com>",
+    "snippet": "Stories for Joshua Price\r\n@jprice2335 (https://medium.com/@jprice2335?source=email-9b48523c8b4d-1762068517927-digest.reader-------------------------72c38c73_2f36_4cbb_9074_0f8afb2ffcf8)\r\n\u00b7Become a mem",
+    "received": "Sun, 02 Nov 2025 12:00:00 +0000 (UTC)",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a444ab0f241629",
+    "subject": "$25 & under gifts that\u2019ll wow \u2019em \ud83d\ude09",
+    "sender": "Walmart <newsletters@em.walmart.com>",
+    "snippet": "From tools to auto gadgets, it\u2019s all here.               From\r\ntools to auto gadgets, it\u2019s all\r\nhere. \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c ",
+    "received": "Sun, 02 Nov 2025 11:18:55 +0000 (UTC)",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a44419ff2848f1",
+    "subject": "You have no events scheduled today.",
+    "sender": "Google Calendar <calendar-notification@google.com>",
+    "snippet": "Joshua _Price, you have no events scheduled today Sun Nov 2, 2025.\r\n\r\nView your calendar at https://calendar.google.com/calendar/\r\n\r\nYou are receiving this email at the account jprice2335@gmail.com be",
+    "received": "Sun, 02 Nov 2025 11:09:02 +0000",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a441016d05b862",
+    "subject": "Security alert",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "snippet": "[image: Google]\r\nA new sign-in on Windows\r\n\r\n\r\njprice2335@gmail.com\r\nWe noticed a new sign-in to your Google Account on a Windows device. If\r\nthis was you, you don\u2019t need to do anything. If not, we\u2019ll",
+    "received": "Sun, 02 Nov 2025 10:14:55 GMT",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a43df21b957594",
+    "subject": "Security alert",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "snippet": "[image: Google]\r\nA new sign-in on Windows\r\n\r\n\r\njprice2335@gmail.com\r\nWe noticed a new sign-in to your Google Account on a Windows device. If\r\nthis was you, you don\u2019t need to do anything. If not, we\u2019ll",
+    "received": "Sun, 02 Nov 2025 09:21:26 GMT",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a43b65c1002975",
+    "subject": "Reminder: Please provide feedback + $1,000 chance to win",
+    "sender": "Walmart Customer Experience <walmartcustomerexperience@feedback.walmart.com>",
+    "snippet": "Your chance to win a $1,000 gift card!\r\n\r\nGot 2 minutes?\r\nTell us about your recent Walmart.com experience for a chance to win a $1,000 gift card*.\r\nYour feedback will help us improve our service.\r\n\r\n",
+    "received": "Sun, 2 Nov 2025 01:36:46 -0700 (PDT)",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  },
+  {
+    "id": "19a43a160cff1e67",
+    "subject": "Joshua, follow Robert Herjavec - Shark Investor at Shark Tank ABC",
+    "sender": "LinkedIn <messages-noreply@linkedin.com>",
+    "snippet": "Joshua, add interesting content to your feed. Here are a few recommendations to get started.\r\n\r\n\r\nhttps://www.linkedin.com/comm/mynetwork/discovery-see-all/?usecase=EMAIL_MIXED_RECOMMENDATIONS&lipi=ur",
+    "received": "Sun, 2 Nov 2025 08:13:51 +0000 (UTC)",
+    "risk_score": null,
+    "is_phishing": false,
+    "confidence": null,
+    "ai_result": ""
+  }
+]
