@@ -8,3 +8,5 @@ PyJWT==2.8.0
 msal==1.26.0
 google-auth-oauthlib
 google-api-python-client
+google-auth
+google-auth-httplib2
