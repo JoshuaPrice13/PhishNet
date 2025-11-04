@@ -100,7 +100,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
             <div class="p-6 border-b border-secondary/10 bg-background flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-primary">📧 Email Analysis Results</h2>
-                    <p class="text-gray-600 text-sm mt-1">AI-powered phishing detection using DistilBERT</p>
+                    <p class="text-gray-600 text-sm mt-1">AI-powered phishing detection using Llama 3.3 via OpenRouter</p>
                 </div>
                 <div class="text-right">
                     <div id="countdown-display" class="text-sm text-gray-500 font-mono">Next sync: --</div>
@@ -138,8 +138,8 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 const data = await response.json();
                 
                 let statusHtml = `<span class="text-white/90">✅ ${data.message}</span>`;
-                if (data.llama_configured) {
-                    statusHtml += ` <span class="text-accent">| 🤖 AI Ready</span>`;
+                if (data.openrouter_configured) {
+                    statusHtml += ` <span class="text-accent">| 🤖 Llama 3.3</span>`;
                 }
                 
                 document.getElementById('backend-status').innerHTML = statusHtml;
@@ -418,13 +418,13 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                 let borderColor = 'border-l-4 border-green-500';
                 let riskBadge = 'bg-green-100 text-green-700';
                 let riskIcon = '✅';
-                
-                if (email.risk_score >= 75) {
+
+                if (email.risk_percentage >= 75) {
                     bgColor = 'bg-red-50';
                     borderColor = 'border-l-4 border-red-600';
                     riskBadge = 'bg-red-100 text-red-700';
                     riskIcon = '🚨';
-                } else if (email.risk_score >= 30) {
+                } else if (email.risk_percentage >= 30) {
                     bgColor = 'bg-yellow-50';
                     borderColor = 'border-l-4 border-yellow-500';
                     riskBadge = 'bg-yellow-100 text-yellow-700';
@@ -460,10 +460,10 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                                 </div>
                                 <div class="ml-4 text-right">
                                     <span class="inline-block px-3 py-1 rounded-full text-sm font-bold ${riskBadge}">
-                                        Risk: ${email.risk_score}%
+                                        Risk: ${email.risk_percentage}%
                                     </span>
                                     <div class="text-xs text-gray-500 mt-1">
-                                        Confidence: ${(email.confidence * 100)}%
+                                        Confidence: ${email.confidence_percentage}%
                                     </div>
                                 </div>
                             </div>
@@ -474,7 +474,7 @@ $BACKEND_URL = getenv('BACKEND_URL') ?: 'http://localhost:7877';
                                         This email has been flagged as a potential phishing attempt by our AI model.
                                     </div>
                                 </div>
-                            ` : email.risk_score >= 30 ? `
+                            ` : email.risk_percentage >= 30 ? `
                                 <div class="bg-yellow-100 border-l-4 border-yellow-500 p-3 mt-3">
                                     <div class="font-bold text-yellow-700 mb-1">⚠️ Moderate Risk</div>
                                     <div class="text-yellow-600 text-sm">
